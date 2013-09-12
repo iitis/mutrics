@@ -1,0 +1,6 @@
+.*.swp
+*.pyc
+*.txt
+*.arff
+__pycache__
+model*
