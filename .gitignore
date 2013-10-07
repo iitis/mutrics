@@ -4,3 +4,7 @@
 *.arff
 __pycache__
 model*
+*.o
+*.so
+*.so.*
+*.a

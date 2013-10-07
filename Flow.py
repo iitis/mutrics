@@ -9,11 +9,16 @@ class Flow:
 		self._origtxt = txt
 		self.data = dict(zip(Flow._fields, txt.split(',')))
 
+		self.gt = self["lpi_proto"]
+
 		self.mod = "?"
 		self.proto = "?"
 		self.history = []
 
-	def register(self, mod, proto, history):
+	def __getitem__(self, key):
+		return self.data[key]
+
+	def classify(self, mod, proto, history):
 		self.mod = mod
 		self.proto = proto
 		self.history = history

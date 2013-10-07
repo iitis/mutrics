@@ -15,10 +15,13 @@ def mutrics(farg):
 		line = line.strip()
 		if not line[0:1].isdigit(): continue
 
-		# classify
+		# read the flow and check it
 		f = Flow(line)
+		if f.gt in P.skip: continue
+
+		# classify
 		(mod, proto, history) = ct.classify(f)
-		f.register(mod, proto, history)
+		f.classify(mod, proto, history)
 
 		# write
 		print(f.txt())

@@ -1,35 +1,35 @@
-class Cascade:
-	_modules = []
-	def register(name, check, classify):
-		assert(name and check and classify)
-		Cascade._modules.append({"name": name, "check": check, "classify": classify})
+class Cascade(object):
+	def classify(self, f):
+		history = []
+
+		for step in self.steps:
+			if not step.check(f):
+				history.append(step.name + ":Skp")
+				continue # skip the classifier
+
+			proto = step.classify(f)
+			if proto != "Unknown":
+				history.append(step.name + ":Ans")
+				break    # quit the cascade here
+
+			history.append(step.name + ":Unk")
+		else:
+			history.append("N/A")
+			return ("END", "Unknown", history)
+
+		return (step.name, proto, history)
 
 	######################################################
 
-	def __init__(self):
-		Cascade.register("END", lambda f: True, lambda f: "Unknown")
+	steps = []
+	@classmethod
+	def register(cls, step):
+		if not hasattr(step, "name"):
+			step.name = step.__module__[4:]
+		if not hasattr(step, "check"):
+			step.check = lambda f: True
+		cls.steps.append(step)
 
-	def classify(self, f):
-		history = []
-		name = "?"
-		proto = "?"
-
-		for mod in Cascade._modules:
-			name = mod["name"]
-
-			if mod["check"](f):
-				# enable module and attempt classification
-				proto = mod["classify"](f)
-
-				if proto == "Unknown":
-					# no decision, move to next module
-					history.append(name + ":Unk")
-				else:
-					# success, quit the tree
-					history.append(name + ":End")
-					break
-			else:
-				# skip the classifier
-				history.append(name + ":Skp")
-
-		return (name, proto, history)
+class CascadeEnd:
+	name = "END"
+	def classify(self, f): return "Unknown"

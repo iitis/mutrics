@@ -1,11 +1,8 @@
-from Cascade import *
+class mod_dummy:
+	skip = ['TCP_Empty', 'Unknown']
 
-def check(f):
-	gt = f.data["lpi_proto"]
-	return gt in ['TCP_Empty', 'Unknown']
+	def check(self, f):
+		return f.data["lpi_proto"] in self.skip
 
-def classify(f):
-	#return f.data["lpi_proto"]
-	return "SKIP"
-
-Cascade.register("dummy", check, classify)
+	def classify(self, f):
+		return "SKIP"
