@@ -1,20 +1,20 @@
-class ClassTree:
+class Cascade:
 	_modules = []
 	def register(name, check, classify):
 		assert(name and check and classify)
-		ClassTree._modules.append({"name": name, "check": check, "classify": classify})
+		Cascade._modules.append({"name": name, "check": check, "classify": classify})
 
 	######################################################
 
 	def __init__(self):
-		ClassTree.register("END", lambda f: True, lambda f: "Unknown")
+		Cascade.register("END", lambda f: True, lambda f: "Unknown")
 
 	def classify(self, f):
 		history = []
 		name = "?"
 		proto = "?"
 
-		for mod in ClassTree._modules:
+		for mod in Cascade._modules:
 			name = mod["name"]
 
 			if mod["check"](f):

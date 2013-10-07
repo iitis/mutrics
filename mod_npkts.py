@@ -1,7 +1,7 @@
 from npkts import HTClass
-from ClassTree import *
+from Cascade import *
 
-model = "./npkts/model"
+model = "./npkts/model2"
 n = 1
 
 htc = HTClass.HTClass()
@@ -23,4 +23,4 @@ def classify(f):
 
 	return htc.one([pp] + up + down)
 
-ClassTree.register("npkts", check, classify)
+Cascade.register("npkts", check, classify)

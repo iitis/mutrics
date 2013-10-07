@@ -19,13 +19,15 @@ def main(param, src, model):
 
 		samples.append(([protoport] + up + down, gt))
 
-	# test
+	# load model
 	knc = HTClass()
 	knc.load(model)
 
 	# test
 	(acc, ratio) = knc.score([x[0] for x in samples], [x[1] for x in samples])
-	print("%.2f\t%.2f" % (acc * 100.0, ratio * 100.0))
+
+	# print the result
+	print("ok %.3f%%\tin %.3f%%\tof %d K total" % (acc * 100.0, ratio * 100.0, len(samples)/1000.0))
 
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description='First packets size traffic classifier tester')

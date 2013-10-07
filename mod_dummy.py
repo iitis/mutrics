@@ -1,4 +1,4 @@
-from ClassTree import *
+from Cascade import *
 
 def check(f):
 	gt = f.data["lpi_proto"]
@@ -8,4 +8,4 @@ def classify(f):
 	#return f.data["lpi_proto"]
 	return "SKIP"
 
-ClassTree.register("dummy", check, classify)
+Cascade.register("dummy", check, classify)

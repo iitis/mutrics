@@ -23,7 +23,7 @@ class Flow:
 		dst = "{fc_dst_addr:}:{fc_dst_port}".format_map(self.data)
 		s1 = "{0[fc_id]:7} {0[fc_proto]} {1:>21}<->{2:<21}".format(self.data, src, dst)
 		s2 = self.data["lpi_proto"] # ground-truth
-		s3 = "{0.proto} ({0.mod})".format(self)
+		s3 = "{0.proto}".format(self)
 		s4 = " ".join(self.history)
 
-		return "{0} {1:>10} is {2:<18} // {3}".format(s1, s2, s3, s4)
+		return "{0} {1:>10} is {2:<10} # {3}".format(s1, s2, s3, s4)

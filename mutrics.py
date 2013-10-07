@@ -3,13 +3,13 @@
 import sys
 import argparse
 from Flow import *
-from ClassTree import *
+from Cascade import *
 
 #########################################################################
 
 def mutrics(farg):
 	read_arff_header(farg)
-	ct = ClassTree()
+	ct = Cascade()
 
 	for line in farg:
 		line = line.strip()

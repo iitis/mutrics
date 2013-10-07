@@ -3,7 +3,7 @@
 # TODO: target DNS flows
 #
 
-from ClassTree import *
+from Cascade import *
 
 def check(f):
 	if "dns_name" in f.data and f.data["dns_name"][0] != '?':
@@ -23,4 +23,4 @@ def classify(f):
 	else:
 		return "Unknown"
 
-ClassTree.register("dnsclass", check, classify)
+Cascade.register("dnsclass", check, classify)
