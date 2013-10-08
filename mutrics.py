@@ -7,11 +7,13 @@ from Cascade import *
 
 #########################################################################
 
-def mutrics(farg):
-	read_arff_header(farg)
-	ct = Cascade()
+def mutrics(src, dst, dump, dumpl, limit, fmt):
+	# read the ARFF header
+	Flow.read_arff_header(src)
 
-	for line in farg:
+	# init modules and go
+	cs = Cascade()
+	for line in src:
 		line = line.strip()
 		if not line[0:1].isdigit(): continue
 
@@ -20,36 +22,59 @@ def mutrics(farg):
 		if f.gt in P.skip: continue
 
 		# classify
-		(mod, proto, history) = ct.classify(f)
-		f.classify(mod, proto, history)
+		show = cs.classify(f, dump, dumpl)
 
-		# write
-		print(f.txt())
+		# print it to the user?
+		if not show:
+			continue
+		if limit:
+			if f.isunk():
+				if "unk" not in limit: continue
+			elif "ans" not in limit:
+				if f.isok()  and "ok"  not in limit: continue
+				if f.iserr() and "err" not in limit: continue
 
-def read_arff_header(farg):
-	for line in farg:
-		line = line.strip()
-
-		if line[0:11] == '@attribute ':
-			field = line.split()[1]
-			Flow.add_field(field)
-		elif line[0:5] == '@data':
-			return
+		# print
+		f.print(dst, fmt)
 
 #########################################################################
 
 def main():
-	p = argparse.ArgumentParser(description='Multilevel, Modular Traffic Classifier')
-	p.add_argument('file', nargs='?', help='input file in ARFF format [stdin]')
+	# parse arguments
+	p = argparse.ArgumentParser(description='Multilevel Traffic Classifier')
+
+	p.add_argument('input', nargs='?',
+		type=argparse.FileType('r'), default=sys.stdin, help='input file in ARFF format [stdin]')
+	p.add_argument('output', nargs='?',
+		type=argparse.FileType('w'), default=sys.stdout, help='output file [stdout]')
 	p.add_argument("--exe", default='./params.py', help="exec given Python file first (e.g. for params)")
+	p.add_argument("--dump", nargs=1, help="dump given flows of a particular module (e.g. dnsclass:Unk+Err)")
+	p.add_argument("--limit", nargs=1, help="limit output to given flows (e.g. Unk+Err)")
+	p.add_argument("--format", choices=['txt', 'arff'], default='txt', help="output format")
+
 	args = p.parse_args()
 
-	if not args.file:
-		farg = sys.stdin
-	else:
-		farg = open(args.file, "r")
+	# dumping
+	dump = None
+	dumpl = []
+	if args.dump:
+		try:
+			(dump, v) = [x.strip().lower() for x in args.dump[0].split(":")]
+			dumpl = [x.strip().lower() for x in v.split("+")]
+		except:
+			dump = (args.dump[0].split(":")[0]).strip().lower()
+			dumpl = ["ans"]
 
-	if args.exe: exec(open(args.exe).read())
-	mutrics(farg)
+	# limits
+	if args.limit:
+		limit = [x.strip().lower() for x in args.limit[0].split("+")]
+	else:
+		limit = None
+
+	# params.py
+	if args.exe:
+		exec(open(args.exe).read())
+
+	mutrics(args.input, args.output, dump, dumpl, limit, args.format)
 
 if __name__ == "__main__": main()
