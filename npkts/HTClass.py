@@ -98,9 +98,8 @@ class HTClass:
 		return (acc, scope)
 
 	def one(self, x):
-		k = ",".join(x)
-
-		if k not in self.ht:
-			return "Unknown"
-		else:
+		try:
+			k = ",".join(x)
 			return self.ht[k]
+		except:
+			return "Unknown"

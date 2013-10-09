@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import re
-import tldextract
+from . import tldextract
 from . import params as P
 
 def do_segment(word):
