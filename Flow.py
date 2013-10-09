@@ -19,8 +19,11 @@ class Flow(object):
 	def iserr(self): return self.proto != self.gt
 	def isunk(self): return self.proto == "Unknown"
 
-	def print(self, out, fmt):
-		if fmt == "txt":
+	def write(self, out, fmt):
+		if fmt == "none":
+			return
+
+		elif fmt == "txt":
 			src = "{fc_src_addr:}:{fc_src_port}".format_map(self.data)
 			dst = "{fc_dst_addr:}:{fc_dst_port}".format_map(self.data)
 			s1 = "{0[fc_id]:7} {0[fc_proto]} {1:>21}<->{2:<21}".format(self.data, src, dst)
@@ -29,6 +32,7 @@ class Flow(object):
 			s4 = " ".join(self.history)
 
 			s = "{0} {1:>10} is {2:<10} # {3}".format(s1, s2, s3, s4)
+
 		elif fmt == "arff":
 			self.write_arff_header(out)
 

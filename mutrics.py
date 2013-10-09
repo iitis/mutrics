@@ -7,7 +7,7 @@ from Cascade import *
 
 #########################################################################
 
-def mutrics(src, dst, dump, dumpl, limit, fmt):
+def mutrics(src, dst, dump, dumpl, limit, fmt, cstats):
 	# read the ARFF header
 	Flow.read_arff_header(src)
 
@@ -35,7 +35,12 @@ def mutrics(src, dst, dump, dumpl, limit, fmt):
 				if f.iserr() and "err" not in limit: continue
 
 		# print
-		f.print(dst, fmt)
+		f.write(dst, fmt)
+
+	# cascade stats?
+	if cstats:
+		for s in cs.get_stats():
+			print("%s: %s\n" % (s["name"], s["stats"]))
 
 #########################################################################
 
@@ -50,7 +55,8 @@ def main():
 	p.add_argument("--exe", default='./params.py', help="exec given Python file first (e.g. for params)")
 	p.add_argument("--dump", nargs=1, help="dump given flows of a particular module (e.g. dnsclass:Unk+Err)")
 	p.add_argument("--limit", nargs=1, help="limit output to given flows (e.g. Unk+Err)")
-	p.add_argument("--format", choices=['txt', 'arff'], default='txt', help="output format")
+	p.add_argument("-f","--format", choices=['txt', 'arff', 'none'], default='txt', help="output format")
+	p.add_argument('-c','--cstats', action='store_true', help="print cascade statistics")
 
 	args = p.parse_args()
 
@@ -75,6 +81,6 @@ def main():
 	if args.exe:
 		exec(open(args.exe).read())
 
-	mutrics(args.input, args.output, dump, dumpl, limit, args.format)
+	mutrics(args.input, args.output, dump, dumpl, limit, args.format, args.cstats)
 
 if __name__ == "__main__": main()
