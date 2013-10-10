@@ -1,4 +1,5 @@
 from collections import defaultdict
+from common import *
 
 class Cascade(object):
 	def classify(self, f, dump, dumpl):
@@ -59,12 +60,28 @@ class Cascade(object):
 		return ret
 
 	def get_stats(self):
-		ret = []
+		s = ""
+
+		if len(self.steps) == 0: return
+
+		tot = float(self.steps[0].stats["in"])
+		s += "Total: %s (#tot)\n" % fc(tot)
 
 		for step in self.steps:
-			ret.append({"name": step.name, "stats": step.stats})
+			ss = step.stats
 
-		return ret
+			s += "  |\n  | %s (%s #tot)\n  |\n" % (fc(ss["in"]), pc(ss["in"], tot))
+			s += "[%-10s]" % step.name
+			s += " -> chk: %s (%s #tot)\n" % (fc(ss["chk"]), pc(ss["chk"], tot))
+			s += "%15s ** ok/err: %s/%s (%s/%s #ans)\n" % ("", fc(ss["ok"]), fc(ss["err"]),
+				pc(ss["ok"], ss["ans"]), pc(ss["err"], ss["ans"]))
+			s += "%15s <- unk: %s (%s #chk)\n" % ("", fc(ss["unk"]), pc(ss["unk"], ss["chk"]))
+			
+
+		unk = self.steps[-1].stats["out"]
+		s += "  |\n  |\nUnknown: %s (%s #tot)" % (fc(unk), pc(unk, tot))
+
+		return s
 
 	######################################################
 
