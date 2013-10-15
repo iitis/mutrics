@@ -11,39 +11,43 @@ def main(param, src, dst, numtrain, numtest):
 	# read data
 	for line in src:
 		line = line.strip()
-		if len(line) == 0 or not line[0].isdigit(): continue
+		if not line[0].isdigit(): continue
 
-		(fid, protoport, ups, downs, gt) = line.split()
-		up   = ups.split(',')[:param.n]
-		down = downs.split(',')[:param.n]
-
-		k = str([protoport] + up + down)
-		samples.append((k, gt))
+		(fid, addr, port, gt) = line.split()
+		samples.append((str([addr, port]), gt))
 
 	# take random samples
 	if numtrain > 0:
 		samples = random.sample(samples, numtrain + numtest)
 		train = samples[:numtrain]
-		test = samples[numtrain:]
+		if numtest > 0:
+			test  = samples[numtrain:]
+		else:
+			test = []
 	else:
+		random.shuffle(samples)
 		train = samples
 		test = []
 
+	# compute the minc
+	minc = int(0.0001 * len(train))
+	print(minc)
+
 	# train
-	knc = HTClass(minc=2)
+	knc = HTClass(minc=minc)
 	knc.fit([x[0] for x in train], [x[1] for x in train])
 
 	# test
 	if len(test) > 0:
 		(acc, ratio, err) = knc.score([x[0] for x in test], [x[1] for x in test])
-		print("%.4f\t%.4f\t%d errors" % (acc * 100.0, ratio * 100.0, err))
+		print("%.4f\t%.4f" % (acc * 100.0, ratio * 100.0))
 
 	# store model
 	if dst:
 		knc.store(dst)
 
 if __name__ == "__main__":
-	p = argparse.ArgumentParser(description='First packets size traffic classifier')
+	p = argparse.ArgumentParser(description='Destination IP traffic classifier')
 	p.add_argument('model', nargs='?', help='output file')
 	p.add_argument('-f','--file', default="-", help='input file [stdin]')
 	p.add_argument("-n", type=int, default=1, help="number of packets [1]")

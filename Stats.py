@@ -68,6 +68,6 @@ class Stats(object):
 			s += "Average %%FP: %6.3g%%\n" % fp
 			s += "Selected: %s of flows\n" % pc(self.ans, self.total)
 			s += "  ok:  %4s\n" % pc(self.ok, self.ans)
-			s += "  err: %4s" % pc(self.err, self.ans)
+			s += "  err: %4s (%d errors)" % (pc(self.err, self.ans), self.err)
 
 		return h + s

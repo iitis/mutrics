@@ -1,8 +1,9 @@
 import pickle
 
 class HTClass:
-	def __init__(self):
+	def __init__(self, minc = 2):
 		self.ht = {}
+		self.minc = minc
 
 	def store(self, dst): pickle.dump(self.ht, dst)
 	def load(self, src): self.ht = pickle.load(src)
@@ -11,8 +12,7 @@ class HTClass:
 		db = {}
 		cnts = {}
 
-		for x,y in zip(X, Y):
-			k = ",".join(x)
+		for k,y in zip(X, Y):
 			if k not in db: db[k] = {}
 			if y not in db[k]: db[k][y] = 0
 			if y not in cnts: cnts[y] = 0
@@ -26,7 +26,7 @@ class HTClass:
 			# if no draws...
 			if len(protos) == 1:
 				(p, c) = list(protos.items())[0]
-				if c == 1:
+				if c < self.minc:
 					dropped += c
 				else:
 					self.ht[k] = p
@@ -76,15 +76,13 @@ class HTClass:
 		if len(X) == 0:
 			return (1.0, 1.0)
 
-		for x,y in zip(X, Y):
-			k = ",".join(x)
-
+		for k,y in zip(X, Y):
 			if k not in self.ht:
 				unk += 1
 			elif self.ht[k] == y:
 				ok += 1
 			else:
-				#print "error: %s is %s not %s" % (k, y, self.ht[k])
+				#print("error: %s is %s not %s" % (k, y, self.ht[k]))
 				err += 1
 
 		#print "input %d, unk %d, ok %d, err %d" % (len(X), unk, ok, err)
@@ -95,11 +93,10 @@ class HTClass:
 
 		scope = 1.0 - 1.0 * unk / len(X)
 
-		return (acc, scope)
+		return (acc, scope, err)
 
-	def one(self, x):
+	def one(self, k):
 		try:
-			k = ",".join(x)
 			return self.ht[k]
 		except:
 			return "Unknown"

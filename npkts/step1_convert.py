@@ -12,7 +12,7 @@ for f in ar:
 	if f["lpi_proto"] == "Unknown": continue
 
 	# ignore flows for which this method does not apply
-	if f["pks_1_up"] == "0" or f["pks_1_down"] == "0": continue
+	#if f["pks_1_up"] == "0" or f["pks_1_down"] == "0": continue
 
 	s1 = "{pks_1_up},{pks_2_up},{pks_3_up},{pks_4_up},{pks_5_up}".format_map(f)
 	s2 = "{pks_1_down},{pks_2_down},{pks_3_down},{pks_4_down},{pks_5_down}".format_map(f)

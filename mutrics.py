@@ -21,9 +21,16 @@ def mutrics(src, dst, dump, dumpl, limit, fmt, cstats, stats):
 		line = line.strip()
 		if not line[0:1].isdigit(): continue
 
-		# read the flow and check it
+		# read the flow
 		f = Flow(line)
-		if f.gt in P.skip: continue
+
+		# check if f.gt is enabled
+		try:
+			if f.gt in P.skip: continue
+		except: pass
+		try:
+			if f.gt not in P.select: continue
+		except: pass
 
 		# classify
 		show = cs.classify(f, dump, dumpl)
@@ -72,8 +79,11 @@ def main():
 	p.add_argument("-f","--format", choices=['txt', 'arff', 'none'], default='txt', help="output format")
 	p.add_argument('-s','--stats', action='store_true', help="print performance statistics")
 	p.add_argument('-c','--cstats', action='store_true', help="print cascade statistics")
+	p.add_argument('-q','--quiet', action='store_true', help="equivalent of --format=none")
 
 	args = p.parse_args()
+
+	if args.quiet: args.format = "none"
 
 	# dumping
 	dump = None
