@@ -5,34 +5,42 @@ import argparse
 from Flow import *
 from Cascade import *
 from Stats import *
+from arff_tools import ArffReader
 
 #########################################################################
 
 def mutrics(src, dst, dump, dumpl, limit, fmt, cstats, stats):
-	# read the ARFF header
-	Flow.read_arff_header(src)
-
 	# init modules
+	src = ArffReader.ArffReader(src)
 	cs = Cascade()
 	st = Stats()
 
+	# setup proto filter
+	if hasattr(P, "skip"):
+		check = lambda gt: gt not in P.skip
+	elif hasattr(P, "select"):
+		check = lambda gt: gt in P.select
+	else:
+		check = lambda: True
+
+	# arff header?
+	if fmt == "arff":
+		src.printh(nodata=True, dst=dst)
+		dst.write("%% MuTriCs Multilevel Traffic Classifier\n")
+		dst.write("% mutrics_module: classifier that contributed the answer\n")
+		dst.write("% mutrics_proto: the identified protocol\n")
+		dst.write("@attribute mutrics_module string\n")
+		dst.write("@attribute mutrics_proto string\n\n")
+		dst.write("@data\n")
+
 	# go!
-	for line in src:
-		line = line.strip()
-		if not line[0:1].isdigit(): continue
+	for d in src:
+		# check if gt is enabled
+		gt = d[P.gtcol]
+		if not check(gt): continue
 
-		# read the flow
-		f = Flow(line)
-
-		# check if f.gt is enabled
-		try:
-			if f.gt in P.skip: continue
-		except: pass
-		try:
-			if f.gt not in P.select: continue
-		except: pass
-
-		# classify
+		# parse and classify
+		f = Flow(src, d, gt)
 		show = cs.classify(f, dump, dumpl)
 
 		# print it to the user?
@@ -46,7 +54,7 @@ def mutrics(src, dst, dump, dumpl, limit, fmt, cstats, stats):
 				if f.iserr() and "err" not in limit: continue
 
 		# print and count
-		f.write(dst, fmt)
+		f.write(fmt, dst)
 		st.count(f)
 
 	# cascade stats?
@@ -80,7 +88,6 @@ def main():
 	p.add_argument('-s','--stats', action='store_true', help="print performance statistics")
 	p.add_argument('-c','--cstats', action='store_true', help="print cascade statistics")
 	p.add_argument('-q','--quiet', action='store_true', help="equivalent of --format=none")
-
 	args = p.parse_args()
 
 	if args.quiet: args.format = "none"
@@ -103,8 +110,7 @@ def main():
 		limit = None
 
 	# params.py
-	if args.exe:
-		exec(open(args.exe).read())
+	if args.exe: exec(open(args.exe).read())
 
 	mutrics(args.input, args.output, dump, dumpl, limit, args.format, args.cstats, args.stats)
 

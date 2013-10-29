@@ -3,10 +3,13 @@
 ################################################
 global P; P = lambda:0
 
+P.gtcol = "2lpi_proto"
+
 #P.skip = ["Unknown", "TCP_Empty", "SNMP", "Radius", "Syslog"]
 P.select = [
 	"Ares",
 	"BitTorrent",
+	"DNS",
 	"eMule",
 	"Gnutella",
 	"HalfLife",
@@ -16,15 +19,14 @@ P.select = [
 	"Mail",
 	"NTP",
 	"RTMP",
-	"SIP",
 	"Skype",
 	"SQL",
 	"SSDP",
 	"SSH",
 	"Steam",
 	"STUN",
-	"Teamviewer",
 	"Teredo",
+	"Teamviewer",
 	"WWW",
 	"XboxLive",
 ]
@@ -34,15 +36,18 @@ P.select = [
 ################################################
 
 from mod_dnsclass import *
-from mod_npkts import *
+from mod_portsize import *
 from mod_dstip import *
+from mod_npkts import *
 
 # init modules
-dnsclass = mod_dnsclass("./dnsclass/model/model")
-npkts = mod_npkts("./npkts/data/model")
+dnsclass = mod_dnsclass("./dnsclass/data/model")
+portsize = mod_portsize("./portsize/data/model")
 dstip = mod_dstip("./dstip/data/model")
+npkts = mod_npkts("./npkts/data/model")
 
 # register
 Cascade.register(dstip)
-Cascade.register(npkts)
 Cascade.register(dnsclass)
+Cascade.register(portsize)
+Cascade.register(npkts)

@@ -14,12 +14,14 @@ class mod_dnsclass:
 		self.m.text_converter.text_prep.tokenizer = tokenizer.tokenizer
 
 	def check(self, f):
-		if f["lpi_proto"] == "DNS": return True
+#		if f["lpi_proto"] == "DNS": return True
+		if f["dns_flow"] == "1": return True
 		if f["dns_name"][0] != '?': return True
 		return False
 
 	def classify(self, f):
-		if f["lpi_proto"] == "DNS": return "DNS" # @1
+#		if f["lpi_proto"] == "DNS": return "DNS" # @1
+		if f["dns_flow"] == "1": return "DNS"
 
 		k = "{dns_name}:{fc_dst_port}/{fc_proto}".format_map(f)
 		r = classifier.predict_single_text(k, self.m)

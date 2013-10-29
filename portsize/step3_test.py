@@ -13,11 +13,9 @@ def main(param, src, model):
 		line = line.strip()
 		if not line[0].isdigit(): continue
 
-		(fid, protoport, ups, downs, gt) = line.split()
-		up   = ups.split(',')[:param.n]
-		down = downs.split(',')[:param.n]
+		(fid, proto, port, up, down, gt) = line.split()
 
-		k = str([protoport] + up + down)
+		k = ",".join([proto, port, up, down])
 		samples.append((k, gt))
 
 	# load model
@@ -28,13 +26,13 @@ def main(param, src, model):
 	(acc, ratio, err) = knc.score([x[0] for x in samples], [x[1] for x in samples])
 
 	# print the result
-	print("ok %.3f%%\tin %.3f%%\tof %d K total" % (acc * 100.0, ratio * 100.0, len(samples)/1000.0))
+	print("ok %.3f%%\tin %.3f%%\tof %d K total (%d errors)" %
+		(acc * 100.0, ratio * 100.0, len(samples)/1000.0, err))
 
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description='First packets size traffic classifier tester')
 	p.add_argument('model', help='model file')
 	p.add_argument('-f','--file', default="-", help='input file [stdin]')
-	p.add_argument("-n", type=int, default=1, help="number of packets [1]")
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
 	args = p.parse_args()
 
@@ -45,8 +43,7 @@ if __name__ == "__main__":
 	else:
 		farg = open(args.file, "r")
 
-	if args.exe:
-		exec(open(args.exe).read())
+	if args.exe: exec(open(args.exe).read())
 
 	main(args, farg, marg)
 

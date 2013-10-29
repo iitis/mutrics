@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import re
 
-#import tldextract
-#import params as P
-from . import tldextract
-from . import params as P
+# yuck!
+import sys
+from os import path
+sys.path.insert(0, path.dirname(__file__))
+
+import tldextract
+import params as P
 
 def do_segment(word):
 	if len(word) > 0:
