@@ -1,19 +1,17 @@
 from npkts import kNN
 
 class mod_npkts:
-	def __init__(self, model):
-		self.n = 1
-		self.cls = kNN.kNN()
-		self.cls.load(open(model, "rb"))
+	def __init__(self, model_tcp, model_udp):
+		self.cls_tcp = kNN.kNN()
+		self.cls_tcp.load(open(model_tcp, "rb"))
 
-	def check(self, f):
-		if f["pks_1_up"] == "0" or f["pks_1_down"] == "0":
-			return False
-		else:
-			return True
+		self.cls_udp = kNN.kNN()
+		self.cls_udp.load(open(model_udp, "rb"))
 
 	def classify(self, f):
-		up   = [int(f["pks_%d_up"%i])   for i in range(1,self.n+1)]
-		down = [int(f["pks_%d_down"%i]) for i in range(1,self.n+1)]
+		k = [int(f["pks_1_up"]), int(f["pks_1_down"])]
 
-		return self.cls.one(up + down)
+		if f["fc_proto"] == "TCP":
+			return self.cls_tcp.one(k)
+		else:
+			return self.cls_udp.one(k)

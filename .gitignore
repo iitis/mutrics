@@ -8,3 +8,4 @@ model*
 *.so
 *.so.*
 *.a
+*/data
