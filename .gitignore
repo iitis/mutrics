@@ -9,3 +9,6 @@ model*
 *.so.*
 *.a
 */data
+OLD
+data
+dnsclass/asnet*

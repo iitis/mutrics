@@ -2,10 +2,14 @@ class Flow(object):
 	def __init__(self, src, data, gt):
 		self.src = src
 		self.data = data
+		self.tstamp = int(data["fc_tstamp"].partition(".")[0])   # seconds
+
 		self.gt = gt
 		self.proto = "Unknown"
 		self.mod = "N/A"
 		self.history = []
+
+		self.mdata = {}            # for module data
 
 	def __getitem__(self, key):
 		return self.data[key]

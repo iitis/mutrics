@@ -6,6 +6,10 @@ class Cascade(object):
 		ret = (dump == None)
 		sel = False
 
+		# call init functions
+		for step in self.steps:
+			if hasattr(step, "init"): step.init(f)
+
 		for step in self.steps:
 			if   sel: break
 			elif dump: sel = (step.name == dump)
@@ -57,6 +61,10 @@ class Cascade(object):
 			if not sel:
 				f.history.append("N/A")
 
+		# call finish functions
+		for step in self.steps:
+			if hasattr(step, "finish"): step.finish(f)
+
 		return ret
 
 	def get_stats(self):
@@ -73,10 +81,9 @@ class Cascade(object):
 			s += "  |\n  | %s (%s #tot)\n  |\n" % (fc(ss["in"]), pc(ss["in"], tot))
 			s += "[%-10s]" % step.name
 			s += " -> chk: %s (%s #tot)\n" % (fc(ss["chk"]), pc(ss["chk"], tot))
-			s += "%15s ** ok/err: %s/%s (%s/%s #ans)\n" % ("", fc(ss["ok"]), fc(ss["err"]),
+			s += "%15s >>> ok/err: %s/%s (%s/%s #ans)\n" % ("", fc(ss["ok"]), fc(ss["err"]),
 				pc(ss["ok"], ss["ans"]), pc(ss["err"], ss["ans"]))
-			s += "%15s <- unk: %s (%s #chk)\n" % ("", fc(ss["unk"]), pc(ss["unk"], ss["chk"]))
-			
+			s += "%12s <- unk: %s (%s #chk)\n" % ("", fc(ss["unk"]), pc(ss["unk"], ss["chk"]))
 
 		unk = self.steps[-1].stats["out"]
 		s += "  |\n  |\nUnknown: %s (%s #tot)" % (fc(unk), pc(unk, tot))

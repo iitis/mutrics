@@ -39,18 +39,15 @@ from mod_dnsclass import *
 from mod_portsize import *
 from mod_dstip import *
 from mod_npkts import *
-from mod_dpi import *
 
 # init modules
+dstip = mod_dstip("./dstip/data/model")
 dnsclass = mod_dnsclass("./dnsclass/data/model")
 portsize = mod_portsize("./portsize/data/model")
-dstip = mod_dstip("./dstip/data/model")
-dpi = mod_dpi("./dpi/data/model")
-npkts = mod_npkts("./npkts/data/model2_tcp", "./npkts/data/model2_udp")
+npkts = mod_npkts("./npkts/data/model")
 
 # register
 Cascade.register(dstip)
 Cascade.register(dnsclass)
 Cascade.register(portsize)
-Cascade.register(dpi)
 Cascade.register(npkts)
