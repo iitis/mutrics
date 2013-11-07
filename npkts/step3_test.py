@@ -33,6 +33,7 @@ def main(P, src, model):
 	#cls = kNN(k=P.k)
 	cls = DT()
 	cls.load(model)
+	cls.algo.set_params(n_jobs=-1)
 
 	# test
 	(acc, ratio, err) = cls.score([x[0] for x in samples], [x[1] for x in samples])
