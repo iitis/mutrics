@@ -1,9 +1,10 @@
 import pickle
 
 class HTClass:
-	def __init__(self, minc = 2):
+	def __init__(self, minc = 2, draws = False):
 		self.ht = {}
 		self.minc = minc
+		self.draws = draws
 
 	def store(self, dst): pickle.dump(self.ht, dst)
 	def load(self, src): self.ht = pickle.load(src)
@@ -26,15 +27,17 @@ class HTClass:
 			# if no draws...
 			if len(protos) == 1:
 				(p, c) = list(protos.items())[0]
-				if c < self.minc:
+				r = 100.0 * c / cnts[p]
+				if c < self.minc and r < 1.0:
 					dropped += c
 				else:
 					self.ht[k] = p
 					saved += c
 				continue
 
-			# skip draws
-			continue
+			# skip draws?
+			if not self.draws:
+				continue
 
 			### optional: try to resolve draws... ###
 
@@ -59,7 +62,7 @@ class HTClass:
 
 			# skip if its not an important rule anyway
 			r = 100.0 * selc / cnts[selp]
-			if r < 2:
+			if r < 25.0:
 				dropped += selc
 				continue
 			else:

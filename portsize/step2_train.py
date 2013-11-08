@@ -27,8 +27,12 @@ def main(param, src, dst, numtrain, numtest):
 		train = samples
 		test = []
 
+	# compute the minc
+	minc = int(0.00001 * len(train))
+	print("minc=%d" % minc)
+
 	# train
-	knc = HTClass(minc=2)
+	knc = HTClass(minc=minc)
 	knc.fit([x[0] for x in train], [x[1] for x in train])
 
 	# test

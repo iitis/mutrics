@@ -24,7 +24,7 @@ else:
 pre.F = 3
 
 # decision value threshold
-pre.T = 0
+pre.T = 0.3
 
 #if tok.flow:
 #    pre.F = 5

@@ -2,7 +2,6 @@ from portsize import HTClass
 
 class mod_portsize:
 	def __init__(self, model):
-		self.n = 1
 		self.htc = HTClass.HTClass()
 		self.htc.load(open(model, "rb"))
 

@@ -4,6 +4,7 @@ import sys
 import argparse
 import random
 from DT import *
+from collections import defaultdict
 
 def main(P, src, dst):
 	samples = []
@@ -21,15 +22,15 @@ def main(P, src, dst):
 		gt = d[-1]
 
 		b = int((len(d)-4) / 2)
-		szup = [int(x) for x in d[3:3+b]][0:P.i]
-		szdown = [int(x) for x in d[3+b:-1]][0:P.i]
+		pl_up = [int(x) for x in d[3:3+b]][0:P.i]
+		pl_down = [int(x) for x in d[3+b:-1]][0:P.i]
 
-		if szup[0] == 0 or szdown[0] == 0: continue
+		if pl_up[0] == -1 or pl_down[0] == -1: continue
 
-		v = [proto,port] + szup + szdown
+		v = [proto,port] + pl_up + pl_down
 		samples.append((v, gt))
 
-	print("read %d samples out of %d total (%.2f)" % (len(samples), total, 1.0*len(samples)/total))
+	print("read %d samples out of %d total (%.2f%%)" % (len(samples), total, 100.0*len(samples)/total))
 
 	# take random samples
 	if P.t > 0:
@@ -54,9 +55,9 @@ def main(P, src, dst):
 	if dst: knc.store(dst)
 
 if __name__ == "__main__":
-	p = argparse.ArgumentParser(description='First packets size traffic classifier')
+	p = argparse.ArgumentParser()
 	p.add_argument('model', nargs='?', help='output file')
-	p.add_argument("-i", type=int, default=1, help="number of packets [1]")
+	p.add_argument("-i", type=int, default=8, help="number of bytes [8]")
 	p.add_argument("-t", type=int, default=0, help="number of training patterns [0=all]")
 	p.add_argument("-T", type=int, default=0, help="number of testing patterns [0=none]")
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
@@ -68,3 +69,4 @@ if __name__ == "__main__":
 	if args.exe: exec(open(args.exe).read())
 
 	main(args, sys.stdin, marg)
+
