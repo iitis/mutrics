@@ -34,7 +34,10 @@ class Flow(object):
 			s3 = "{0.proto}".format(self)
 			s4 = " ".join(self.history)
 
-			dst.write("{0} {1:>10} is {2:<10} # {3}\n".format(s1, s2, s3, s4))
+			if "dns_name" in self.data and self["dns_name"][0] != "?":
+				s4 += " (%s)" % self["dns_name"]
+
+			dst.write("{0} {1:>10} is not {2:<10} # {3}\n".format(s1, s2, s3, s4))
 
 		elif fmt == "arff":
 			add = ",'" + self.mod + "','" + self.proto + "'"

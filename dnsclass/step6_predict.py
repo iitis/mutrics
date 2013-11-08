@@ -33,8 +33,8 @@ def predict(outdir, path, store):
 		below, below_was_ok, below_ok = 0.0, 0.0, 0.0
 
 		for i in xrange(len(res)):
-			dv = max(dvs[i])
-			fc = fcs[i]
+			dv = max(dvs[i])  # decision value
+			fc = fcs[i]       # feature count
 			if fc >= P.pre.F and dv >= P.pre.T:
 				above += 1.0
 				if res[i] == gt[i]: above_ok += 1.0
@@ -47,10 +47,10 @@ def predict(outdir, path, store):
 		total = above + below
 		total_ok = above_ok + below_ok
 		
-		print "above T: %d (%.2f%%), in which accuracy is %.2f%%" % \
+		print "above T: %d (%.2f%%), in which accuracy is %.4f%%" % \
 			(above, above/total*100.0, above_ok/above*100.0)
 		if below > 0:
-			print "below T: %d (%.2f%%), in which accuracy was %.2f%% and now is %.2f%%" % \
+			print "below T: %d (%.2f%%), in which accuracy was %.4f%% and now is %.4f%%" % \
 				(below, below/total*100.0, below_was_ok/below*100.0, below_ok/below*100.0)
 	else:
 		total = float(len(res))

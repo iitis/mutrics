@@ -30,8 +30,8 @@ def do_segment(word):
 def get_flow_features(domain):
 	ret = []
 	text = domain.strip()
-	
-	i = text.find(':')
+
+	i = text.rfind(':')
 	if i > 0:
 		s = text[i:]
 		j = s.find('/')

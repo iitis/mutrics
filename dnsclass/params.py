@@ -20,7 +20,10 @@ else:
 
 ### prediction
 
-pre.F = 0
+# minimum feature count
+pre.F = 3
+
+# decision value threshold
 pre.T = 0
 
 #if tok.flow:
