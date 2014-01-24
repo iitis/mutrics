@@ -3,52 +3,56 @@
 import sys
 import argparse
 import random
-from HTClass import *
+from DT import *
 
-def main(param, src, dst, numtrain, numtest):
+def main(P, src, dst):
 	samples = []
+	total = 0
 
 	# read data
 	for line in src:
 		line = line.strip()
-		if len(line) == 0 or not line[0].isdigit(): continue
+		if not line[0].isdigit(): continue
+		total += 1
 
-		(fid, proto, port, up, down, gt) = line.split()
+		d = line.split()
+		proto = 1 if d[1] == "TCP" else 2
+		port = int(d[2])
+		gt = d[-1]
 
-		k = ",".join([proto, port, up, down])
-		samples.append((k, gt))
+		stats = [int(x) for x in d[3:-1]]
+		if stats[4] == 0 or stats[12] == 0: continue
+
+		v = [proto,port] + stats
+		samples.append((v, gt))
+
+	print("read %d samples out of %d total (%.2f)" % (len(samples), total, 1.0*len(samples)/total))
 
 	# take random samples
-	if numtrain > 0:
-		samples = random.sample(samples, numtrain + numtest)
-		train = samples[:numtrain]
-		test = samples[numtrain:]
+	if P.t > 0:
+		samples = random.sample(samples, P.t+P.T)
+		train = samples[:P.t]
+		test = samples[P.t:]
 	else:
 		train = samples
 		test = []
 
-	# compute the minc
-	minc = int(0.00001 * len(train))
-	if minc < 2: minc = 2
-	print("minc=%d" % minc)
-
 	# train
-	knc = HTClass(minc=minc)
+	knc = DT()
 	knc.fit([x[0] for x in train], [x[1] for x in train])
 
 	# test
 	if len(test) > 0:
 		(acc, ratio, err) = knc.score([x[0] for x in test], [x[1] for x in test])
-		print("%.4f\t%.4f\t%d errors" % (acc * 100.0, ratio * 100.0, err))
+		print("ok %.3f%%\tin %.3f%%\tof %d K total (%d errors)" %
+			(acc * 100.0, ratio * 100.0, len(test)/1000.0, err))
 
 	# store model
-	if dst:
-		knc.store(dst)
+	if dst: knc.store(dst)
 
 if __name__ == "__main__":
-	p = argparse.ArgumentParser(description='First packets size traffic classifier')
+	p = argparse.ArgumentParser()
 	p.add_argument('model', nargs='?', help='output file')
-
 	p.add_argument("-t", type=int, default=0, help="number of training patterns [0=all]")
 	p.add_argument("-T", type=int, default=0, help="number of testing patterns [0=none]")
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
@@ -59,5 +63,4 @@ if __name__ == "__main__":
 
 	if args.exe: exec(open(args.exe).read())
 
-	main(args, sys.stdin, marg, args.t, args.T)
-
+	main(args, sys.stdin, marg)

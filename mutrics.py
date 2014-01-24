@@ -82,6 +82,7 @@ def main():
 	p.add_argument('output', nargs='?',
 		type=argparse.FileType('w'), default=sys.stdout, help='output file [stdout]')
 	p.add_argument("--exe", default='./params.py', help="exec given Python file first (e.g. for params)")
+	p.add_argument("--gt", help="column with ground-truth")
 	p.add_argument("--dump", nargs=1, help="dump given flows of a particular module (e.g. dnsclass:Unk+Err)")
 	p.add_argument("--limit", nargs=1, help="limit output to given flows (e.g. Unk+Err)")
 	p.add_argument("-f","--format", choices=['txt', 'arff', 'none'], default='txt', help="output format")
@@ -109,8 +110,9 @@ def main():
 	else:
 		limit = None
 
-	# params.py
+	# params
 	if args.exe: exec(open(args.exe).read())
+	if args.gt: P.gtcol = args.gt
 
 	mutrics(args.input, args.output, dump, dumpl, limit, args.format, args.cstats, args.stats)
 

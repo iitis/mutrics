@@ -9,6 +9,6 @@ fi
 OUTDIR="$1"
 mkdir -p "$OUTDIR"
 
-arff-select 2lpi_proto dns_name fc_dst_port fc_proto | tail -n +2 | grep -v ?dns_name \
+arff-select gt dns_name fc_dst_port fc_proto | tail -n +2 | grep -v ?dns_name \
 	| sed -re 's;(.*)\t(.*)\t(.*)\t(.*);\1\t\2:\3/\4;g' > "$OUTDIR/data.txt"
 wc -l "$OUTDIR/data.txt"

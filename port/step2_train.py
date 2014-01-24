@@ -29,6 +29,7 @@ def main(param, src, dst, numtrain, numtest):
 
 	# compute the minc
 	minc = int(0.000025 * len(train))
+	if minc < 2: minc=2
 	print("minc=%d" % minc)
 
 	# train

@@ -19,18 +19,13 @@ def main(P, src, model):
 		port = int(d[2])
 		gt = d[-1]
 
-		b = int((len(d)-4) / 2)
-		szup = [int(x) for x in d[3:3+b]][0:P.i]
-		szdown = [int(x) for x in d[3+b:-1]][0:P.i]
+		stats = [int(x) for x in d[3:-1]]
+		if stats[4] == 0 or stats[12] == 0: continue
 
-		if szup[0] == 0 or szdown[0] == 0: continue
-
-		v = [proto,port] + szup + szdown
+		v = [proto,port] + stats
 		samples.append((v, gt))
 
 	# load model
-	#cls = kNN(k=P.k, verb=True)
-	#cls = kNN(k=P.k)
 	cls = DT()
 	cls.load(model)
 	cls.algo.set_params(n_jobs=-1)
@@ -43,7 +38,6 @@ def main(P, src, model):
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description='First packets size traffic classifier tester')
 	p.add_argument('model', help='model file')
-	p.add_argument("-i", type=int, default=4, help="number of packets [4]")
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
 	args = p.parse_args()
 

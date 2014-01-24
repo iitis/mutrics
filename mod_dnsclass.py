@@ -17,6 +17,7 @@ class mod_dnsclass:
 		self.T = T
 
 	def check(self, f):
+		if "dns_flow" not in f.data: return False
 		if f["dns_flow"] == "1": return True
 		if f["dns_name"][0] != '?': return True
 		return False

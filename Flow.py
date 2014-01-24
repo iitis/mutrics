@@ -37,7 +37,8 @@ class Flow(object):
 			if "dns_name" in self.data and self["dns_name"][0] != "?":
 				s4 += " (%s)" % self["dns_name"]
 
-			dst.write("{0} {1:>10} is not {2:<10} # {3}\n".format(s1, s2, s3, s4))
+			w = "is" if self.isok() or self.isunk() else "is not"
+			dst.write("{0} {1:>10} {4} {2:<10} # {3}\n".format(s1, s2, s3, s4, w))
 
 		elif fmt == "arff":
 			add = ",'" + self.mod + "','" + self.proto + "'"

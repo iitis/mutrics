@@ -11,6 +11,9 @@ class mod_dpi:
 		self.keys.extend(["pl_%d_up"%(x+1) for x in range(self.i)])
 		self.keys.extend(["pl_%d_down"%(x+1) for x in range(self.i)])
 
+	def check(self, f):
+		return "pl_1_up" in f.data
+
 	def classify(self, f):
 		proto  = 1 if f["fc_proto"] == "TCP" else 2
 		port   = int(f["fc_dst_port"])

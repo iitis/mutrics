@@ -56,7 +56,7 @@ def main(P, src, dst):
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description='First packets size traffic classifier')
 	p.add_argument('model', nargs='?', help='output file')
-	p.add_argument("-i", type=int, default=1, help="number of packets [1]")
+	p.add_argument("-i", type=int, default=4, help="number of packets [4]")
 	p.add_argument("-t", type=int, default=0, help="number of training patterns [0=all]")
 	p.add_argument("-T", type=int, default=0, help="number of testing patterns [0=none]")
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
