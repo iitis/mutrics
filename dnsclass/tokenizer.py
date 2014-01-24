@@ -1,10 +1,15 @@
 #!/usr/bin/env python
+# Author: Pawel Foremski <pjf@iitis.pl>
+# Copyright (C) 2012-2014 IITiS PAN <http://www.iitis.pl/>
+# Licensed under GNU GPL v3
+
 import re
 
-# yuck!
+### <yuck!>
 import sys
 from os import path
 sys.path.insert(0, path.dirname(__file__))
+### </yuck!>
 
 import tldextract
 import params as P

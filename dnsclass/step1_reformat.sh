@@ -1,8 +1,10 @@
 #!/bin/bash
-
-#
 # Reformat ARFF to LibShortText format
 # http://www.csie.ntu.edu.tw/~cjlin/libshorttext/doc/libshorttext.html#installation-and-data-format
+#
+# Author: Pawel Foremski <pjf@iitis.pl>
+# Copyright (C) 2012-2014 IITiS PAN <http://www.iitis.pl/>
+# Licensed under GNU GPL v3
 #
 
 DIR="`dirname $0`"

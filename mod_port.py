@@ -1,3 +1,7 @@
+# Author: Pawel Foremski <pjf@iitis.pl>
+# Copyright (C) 2012-2014 IITiS PAN <http://www.iitis.pl/>
+# Licensed under GNU GPL v3
+
 from port import HTClass
 
 class mod_port:

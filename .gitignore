@@ -12,3 +12,5 @@ model*
 OLD
 data
 dnsclass/asnet*
+arff_tools
+params-*.py
