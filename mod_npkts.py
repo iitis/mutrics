@@ -9,7 +9,7 @@ class mod_npkts:
 		self.i = i
 		self.cls = DT.DT()
 		self.cls.load(open(model, "rb"))
-		self.cls.algo.set_params(n_jobs=1)
+#		self.cls.algo.set_params(n_jobs=1)
 
 		self.keys = []
 		self.keys.extend(["pks_%d_up"%(x+1) for x in range(self.i)])

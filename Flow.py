@@ -4,7 +4,7 @@
 
 class Flow(object):
 	def __init__(self, src, data, gt):
-		self.src = src
+#		self.src = src
 		self.data = data
 		self.tstamp = int(data["fc_tstamp"].partition(".")[0])   # seconds
 
@@ -44,6 +44,6 @@ class Flow(object):
 			w = "is" if self.isok() or self.isunk() else "is not"
 			dst.write("{0} {1:>10} {4} {2:<10} # {3}\n".format(s1, s2, s3, s4, w))
 
-		elif fmt == "arff":
-			add = ",'" + self.mod + "','" + self.proto + "'"
-			self.src.printd(self.data, add=add, dst=dst)
+#		elif fmt == "arff":
+#			add = ",'" + self.mod + "','" + self.proto + "'"
+#			self.src.printd(self.data, add=add, dst=dst)

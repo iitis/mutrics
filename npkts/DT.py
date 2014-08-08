@@ -5,8 +5,6 @@
 import pickle
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-
-from sklearn.utils import array2d
 from sklearn.tree._tree import DTYPE
 #from multiprocessing import pool
 
@@ -14,6 +12,7 @@ class DT(object):
 	def __init__(self, verb=False):
 		self.algo = RandomForestClassifier(n_jobs=-1)
 		self.verb = verb
+#		self.pool = pool.Pool()
 
 	def store(self, dst): pickle.dump(self.algo, dst)
 	def load(self, src): self.algo = pickle.load(src)
@@ -61,15 +60,14 @@ class DT(object):
 		all_proba = np.zeros((n_samples, n_classes))
 
 		# convert
-		X = array2d(X, dtype=DTYPE)
+		X = np.array(X, ndmin=2, dtype=DTYPE)
 
 #		# ask the trees
 #		args = [(i, X) for i in range(len(self.algo.estimators_))]
-#		probas = pool.Pool().map(self._predict_proba, args)
-#
+#		probas = self.pool.map(self._predict_proba, args)
+
 #		# reduce
 #		for tree, proba_tree in zip(self.algo.estimators_, probas):
-
 		for tree in self.algo.estimators_:
 			proba_tree = tree.predict_proba(X)
 
