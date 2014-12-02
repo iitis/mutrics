@@ -4,7 +4,7 @@
 global P; P = lambda:0
 
 #P.gtcol = "gt"
-P.gtcol = "2lpi_proto"
+P.gtcol = "lpi_proto"
 
 #P.skip = ["Unknown", "TCP_Empty", "SNMP", "Radius", "Syslog"]
 P.select = [
@@ -38,7 +38,8 @@ from mod_port import *
 dstip = mod_dstip("./dstip/data/model")
 dnsclass = mod_dnsclass("./dnsclass/data/model")
 portsize = mod_portsize("./portsize/data/model")
-npkts = mod_npkts("./npkts/data/model4bis", i=4)
+npkts = mod_npkts("./npkts/data/model", i=4)
+#npkts = mod_npkts("./npkts/data/model4bis", i=4)
 #dpi = mod_dpi("./dpi/data/model")
 port = mod_port("./port/data/model")
 

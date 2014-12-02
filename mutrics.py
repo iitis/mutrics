@@ -78,10 +78,10 @@ def waterfall(dump, dumpl, limit, fmt, cstats, stats):
 
 #########################################################################
 
-def bks(limit, fmt, cstats, stats, train, test):
+def bks(limit, fmt, cstats, stats, train, test, profile):
 	src = ArffReader.ArffReader(sys.stdin)
 	dst = sys.stdout
-	cs = BKS()
+	cs = BKS(profile)
 	st = Stats()
 
 	# setup proto filter
@@ -116,7 +116,7 @@ def bks(limit, fmt, cstats, stats, train, test):
 
 		if train:
 			cs.train(s, f.gt)
-		else:
+		elif test:
 			cs.classify(f, s)
 
 			# print it to the user?
@@ -135,6 +135,10 @@ def bks(limit, fmt, cstats, stats, train, test):
 	if train:
 		cs.train_finish()
 		cs.train_store(train)
+
+	# finish profiling
+	if profile:
+		cs.profile_store(profile)
 
 	# algo stats?
 	if cstats:
@@ -169,6 +173,7 @@ def main():
 
 	p.add_argument('-T','--train', type=argparse.FileType('wb'), help="train given model (BKS)")
 	p.add_argument('-E','--test',  type=argparse.FileType('rb'), help="test given model (BKS)")
+	p.add_argument('-P','--profile', type=argparse.FileType('wb'), help="make module profiles (BKS)")
 
 	args = p.parse_args()
 
@@ -198,6 +203,6 @@ def main():
 	if args.algo == "waterfall":
 		waterfall(dump, dumpl, limit, args.format, args.cstats, args.stats)
 	elif args.algo == "bks":
-		bks(limit, args.format, args.cstats, args.stats, args.train, args.test)
+		bks(limit, args.format, args.cstats, args.stats, args.train, args.test, args.profile)
 
 if __name__ == "__main__": main()

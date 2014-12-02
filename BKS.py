@@ -7,27 +7,44 @@ import pickle
 from collections import defaultdict, Counter
 from common import *
 from multiprocessing import Pool
+import time
 
 def ask_task(task):
 	i, f = task
 	step = BKS.steps[i]
 	proto = "Skip"
 
+	# init module
 	if hasattr(step, "init"):
 		step.init(f)
-	if step.check(f):
+
+	# check
+	start = time.time()
+	check = step.check(f)
+	ts = time.time() - start
+
+	# classify
+	if check:
+		start = time.time()
 		proto = step.classify(f)
+		tc = time.time() - start
+	else:
+		tc = -1
+
+	# finalize
 	if hasattr(step, "finish"):
 		step.finish(f)
 
-	return proto
+	return (proto, ts, tc)
 
 class BKS(object):
-	def __init__(self):
+	def __init__(self, profile):
 		self.Tr = dict()
 		self.T = dict()
 		self.stats = defaultdict(int)
 		self.p = Pool()
+		self.profile = profile
+		self.Pr = {"F": set()}
 
 	def ask(self, f):
 		ret = []
@@ -38,24 +55,36 @@ class BKS(object):
 #		res = self.p.map(ask_task, tasks)
 		res = map(ask_task, tasks)
 
-		for (proto, step) in zip(res, self.steps):
+		for (v, step) in zip(res, self.steps):
+			proto, ts, tc = v
+			state = 0 # skip
+
 			if proto != "Skip":
 				step.stats["chk"] += 1
 
 				if proto == "Unknown":
 					step.stats["unk"] += 1
+					state = 1 # reject
 				else:
 					step.stats["ans"] += 1
 
 					if proto == f.gt:
 						step.stats["ok"] += 1
+						state = 2 # ok
 					else:
 						step.stats["err"] += 1
+						state = 3 # error
 
 				ret.append(proto)
 			else:
 				step.stats["skp"] += 1
 				ret.append("Unknown")
+
+			if self.profile:
+				self.profile_record(step, ts, tc, f["fc_id"], state)
+
+		if self.profile:
+			self.Pr["F"].add(f["fc_id"])
 
 		return ret
 
@@ -113,6 +142,47 @@ class BKS(object):
 	def train_store(self, dst):
 		pickle.dump(self.T, dst)
 		dst.flush()
+
+	def profile_store(self, dst):
+		pickle.dump(self.Pr, dst)
+		dst.flush()
+
+	def profile_record(self, step, ts, tc, fid, state):
+		# track per-module performance
+		if step.name not in self.Pr:
+			p = dict()
+			p["FS"] = set()
+			p["FR"] = set()
+			p["FE"] = set()
+			self.Pr[step.name] = p
+		else:
+			p = self.Pr[step.name]
+
+		# average selection time
+		if ts > 0:
+			if "ts" in p:
+				p["tsc"] += 1.0
+				p["ts"] += (ts - p["ts"]) / p["tsc"]
+			else:
+				p["tsc"] = 1.0
+				p["ts"] = ts
+
+		# average classification time
+		if tc > 0:
+			if "tc" in p:
+				p["tcc"] += 1.0
+				p["tc"] += (tc - p["tc"]) / p["tcc"]
+			else:
+				p["tcc"] = 1.0
+				p["tc"] = tc
+
+		# flow sets (skip FR)
+		if state == 0:
+			p["FS"].add(fid)
+		elif state == 1:
+			p["FR"].add(fid)
+		elif state == 3:
+			p["FE"].add(fid)
 
 	def train_load(self, src):
 		self.T = pickle.load(src)
