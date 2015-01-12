@@ -153,6 +153,7 @@ class BKS(object):
 			p = dict()
 			p["FS"] = set()
 			p["FR"] = set()
+			p["FO"] = set()
 			p["FE"] = set()
 			self.Pr[step.name] = p
 		else:
@@ -176,11 +177,13 @@ class BKS(object):
 				p["tcc"] = 1.0
 				p["tc"] = tc
 
-		# flow sets (skip FR)
+		# flow sets
 		if state == 0:
 			p["FS"].add(fid)
 		elif state == 1:
 			p["FR"].add(fid)
+		elif state == 2:
+			p["FO"].add(fid)
 		elif state == 3:
 			p["FE"].add(fid)
 
