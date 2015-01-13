@@ -3,7 +3,12 @@
 # Licensed under GNU GPL v3
 
 class Flow(object):
+	counter = 0
+
 	def __init__(self, src, data, gt):
+		Flow.counter += 1
+		self.id = Flow.counter
+
 #		self.src = src
 		self.data = data
 		self.tstamp = int(data["fc_tstamp"].partition(".")[0])   # seconds

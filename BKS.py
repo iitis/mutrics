@@ -81,10 +81,10 @@ class BKS(object):
 				ret.append("Unknown")
 
 			if self.profile:
-				self.profile_record(step, ts, tc, f["fc_id"], state)
+				self.profile_record(step, ts, tc, f.id, state)
 
 		if self.profile:
-			self.Pr["F"].add(f["fc_id"])
+			self.Pr["F"].add(f.id)
 
 		return ret
 
