@@ -6,7 +6,7 @@ from collections import defaultdict
 from common import *
 
 class Cascade(object):
-	def classify(self, f, dump, dumpl):
+	def classify(self, f, dump=None, dumpl=None):
 		ret = (dump == None)
 		sel = False
 
@@ -107,4 +107,4 @@ class Cascade(object):
 		if not hasattr(step, "stats"):
 			step.stats = defaultdict(int)
 
-		cls.steps.append(step)
+		Cascade.steps.append(step)

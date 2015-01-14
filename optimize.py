@@ -46,6 +46,7 @@ def evaluate(profile, X):
 	eX = 0.0
 	uX = 0.0
 	cs = Cascade()
+	cs.steps = []
 
 	for x in X:
 		P = profile[x]
@@ -88,7 +89,7 @@ def cost(L, tX, eX, uX):
 	uX = uX/L * 1000000.0
 
 	# compute
-	C = math.pow(tX, 0.5) + math.pow(eX, 1.75) + math.pow(uX, 1.1);
+	C = math.pow(tX, 0.95) + math.pow(eX, 1.75) + math.pow(uX, 1.2);
 
 	return C
 
@@ -99,7 +100,11 @@ def main():
 	p = argparse.ArgumentParser(description='Waterfall optimizer')
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
 	p.add_argument('-P','--profile', required=True, type=argparse.FileType('rb'), help="file with module profiles")
+	p.add_argument('-E','--evaluate', nargs='+', type=str, help="cascade to evaluate")
 	args = p.parse_args()
+
+#	for e in args.evaluate: print(e)
+#	return
 
 	if args.exe: exec(open(args.exe).read())
 
