@@ -11,15 +11,16 @@ import math
 from Cascade import *
 from collections import defaultdict
 
-def optimizer_start(profile, sol):
+def optimizer_start(args, profile, sol):
 	E = list(profile.keys() - "F")
-	print(profile.keys())
+	E.sort()
+	print(E)
 
 	for m in E:
 		print("--> %s <--" % m)
-		optimizer_branch(profile, sol, len(profile["F"]), profile["F"].copy(), [], E.copy(), 0.0, 0.0, m, "  ")
+		optimizer_branch(args, profile, sol, len(profile["F"]), profile["F"].copy(), [], E.copy(), 0.0, 0.0, m, "  ")
 
-def optimizer_branch(profile, sol, L, G, X, E, tX, eX, m, i=""):
+def optimizer_branch(args, profile, sol, L, G, X, E, tX, eX, m, i=""):
 	X.append(m)
 	E.remove(m)
 
@@ -30,7 +31,7 @@ def optimizer_branch(profile, sol, L, G, X, E, tX, eX, m, i=""):
 	G.difference_update(P["FE"])
 	uX = len(G)
 
-	C = cost(L, tX, eX, uX)
+	C = cost(args, L, tX, eX, uX)
 	if C < sol["bestC"]:
 		print("%s%s: %g %g %g -> %g" % (i, X, tX, eX, uX, C))
 		sol["bestC"] = C
@@ -38,7 +39,7 @@ def optimizer_branch(profile, sol, L, G, X, E, tX, eX, m, i=""):
 
 	# recurse
 	for m in E:
-		optimizer_branch(profile, sol, L, G.copy(), X.copy(), E.copy(), tX, eX, m, i+"  ")
+		optimizer_branch(args, profile, sol, L, G.copy(), X.copy(), E.copy(), tX, eX, m, i+"  ")
 
 def evaluate(profile, X):
 	G = profile["F"].copy()
@@ -82,14 +83,14 @@ def evaluate(profile, X):
 
 	return tX, eX, uX, cs.get_stats()
 
-def cost(L, tX, eX, uX):
+def cost(args, L, tX, eX, uX):
 	# normalize
 	tX = tX/L * 1000000.0
 	eX = eX/L * 1000000.0
 	uX = uX/L * 1000000.0
 
 	# compute
-	C = math.pow(tX, 0.95) + math.pow(eX, 1.75) + math.pow(uX, 1.2);
+	C = math.pow(tX, args.t) + math.pow(eX, args.e) + math.pow(uX, args.u);
 
 	return C
 
@@ -100,22 +101,32 @@ def main():
 	p = argparse.ArgumentParser(description='Waterfall optimizer')
 	p.add_argument("--exe", help="exec given Python file first (e.g. for params)")
 	p.add_argument('-P','--profile', required=True, type=argparse.FileType('rb'), help="file with module profiles")
-	p.add_argument('-E','--evaluate', nargs='+', type=str, help="cascade to evaluate")
+	p.add_argument('-E','--evaluate', type=str, help="cascade to evaluate (mod1,mod2,...)")
+	p.add_argument('-t', type=float, default=0.95, help='f(): tX exponent')
+	p.add_argument('-e', type=float, default=1.75, help='e(): eX exponent')
+	p.add_argument('-u', type=float, default=1.20, help='u(): UX exponent')
 	args = p.parse_args()
-
-#	for e in args.evaluate: print(e)
-#	return
 
 	if args.exe: exec(open(args.exe).read())
 
 	###
 	profile = pickle.load(args.profile)
-	sol = {"bestC": float("inf"), "bestX": []}
-	optimizer_start(profile, sol)
 
-	print("Solution %s: %g" % (sol["bestX"], sol["bestC"]))
+	# just evaluate given X?
+	if args.evaluate:
+		X = args.evaluate.split(',')
 
-	tX, eX, uX, stats = evaluate(profile, sol["bestX"])
+	# find the best!
+	else:
+		sol = {"bestC": float("inf"), "bestX": []}
+		optimizer_start(args, profile, sol)
+		print("Best solution %s: %g" % (sol["bestX"], sol["bestC"]))
+		X = sol["bestX"]
+
+	tX, eX, uX, stats = evaluate(profile, X)
+	C = cost(args, len(profile["F"]), tX, eX, uX)
 	print(stats)
+	print()
+	print("%.2f\t%d\t%d\t%s\t%g" % (tX, eX, uX, ",".join(X), C))
 
 if __name__ == "__main__": main()
