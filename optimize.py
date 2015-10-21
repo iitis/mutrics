@@ -20,7 +20,11 @@ def optimizer_start(args, profile, sol):
 		print("--> %s <--" % m)
 		optimizer_branch(args, profile, sol, len(profile["F"]), profile["F"].copy(), [], E.copy(), 0.0, 0.0, m, "  ")
 
+counter = 0
 def optimizer_branch(args, profile, sol, L, G, X, E, tX, eX, m, i=""):
+	global counter
+	counter += 1
+
 	X.append(m)
 	E.remove(m)
 
@@ -31,9 +35,9 @@ def optimizer_branch(args, profile, sol, L, G, X, E, tX, eX, m, i=""):
 	G.difference_update(P["FE"])
 	uX = len(G)
 
-	C = cost(args, L, tX, eX, uX)
+	C,tXn,eXn,uXn = cost(args, L, tX, eX, uX)
 	if C < sol["bestC"]:
-		print("%s%s: %g %g %g -> %g" % (i, X, tX, eX, uX, C))
+		print("%s%s: %g %g %g -> %g" % (i, X, tXn, eXn, uXn, C))
 		sol["bestC"] = C
 		sol["bestX"] = X
 
@@ -92,7 +96,7 @@ def cost(args, L, tX, eX, uX):
 	# compute
 	C = math.pow(tX, args.t) + math.pow(eX, args.e) + math.pow(uX, args.u);
 
-	return C
+	return C,tX,eX,uX
 
 #########################################################################
 
@@ -105,12 +109,27 @@ def main():
 	p.add_argument('-t', type=float, default=0.95, help='f(): tX exponent')
 	p.add_argument('-e', type=float, default=1.75, help='e(): eX exponent')
 	p.add_argument('-u', type=float, default=1.20, help='u(): UX exponent')
+	p.add_argument('--show', action='store_true', help='show profile and quit')
 	args = p.parse_args()
 
 	if args.exe: exec(open(args.exe).read())
 
 	###
 	profile = pickle.load(args.profile)
+
+	# display the profile
+	#L = float(len(profile["F"]))
+	for mod in profile:
+		if mod == "F": continue
+		P = profile[mod]
+		print("%-10s: T=%6.1f" % (mod, (P["ts"]+P["tc"]*1e6)))
+#		fser = (L - len(P["FS"])) / L*100.0
+#		frr = len(P["FR"]) / L*100.0
+#		fer = len(P["FE"]) / L*100.0
+#		print("%-10s: T=%6.1f, FE=%.1f%%" %
+#			(mod, (P["ts"]+P["tc"]*1e6), fer))
+	print("")
+	if args.show: return
 
 	# just evaluate given X?
 	if args.evaluate:
@@ -124,9 +143,11 @@ def main():
 		X = sol["bestX"]
 
 	tX, eX, uX, stats = evaluate(profile, X)
-	C = cost(args, len(profile["F"]), tX, eX, uX)
+	C,tXn,eXn,uXn = cost(args, len(profile["F"]), tX, eX, uX)
 	print(stats)
-	print()
-	print("%.2f\t%d\t%d\t%s\t%g" % (tX, eX, uX, ",".join(X), C))
+	print("\n%s\t%.1f\t%.1f\t%.1f\t%.1f" % (",".join(X), tXn, eXn, uXn, C))
+
+	global counter
+	print("\nnumber of iterations: %d" % (counter))
 
 if __name__ == "__main__": main()

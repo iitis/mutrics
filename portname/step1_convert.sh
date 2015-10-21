@@ -4,4 +4,6 @@
 # Licensed under GNU GPL v3
 
 GT="${1:-gt}"
-arff-select fc_id fc_dst_addr fc_dst_port $GT
+
+arff-select fc_id fc_proto fc_dst_port dns_name $GT \
+	| grep -v '?dns_name'
